@@ -3,17 +3,17 @@
 # Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.
 
 import os
-import warnings
 import sys
+import warnings
 
-import pandas as pd
+import mlflow.sklearn
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.model_selection import train_test_split
+import pandas as pd
 from sklearn.linear_model import ElasticNet
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 
 import mlflow
-import mlflow.sklearn
 
 
 def eval_metrics(actual, pred):
@@ -23,13 +23,14 @@ def eval_metrics(actual, pred):
     return rmse, mae, r2
 
 
-
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     np.random.seed(40)
 
     # Read the wine-quality csv file (make sure you're running this from the root of MLflow!)
-    wine_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "wine-quality.csv")
+    wine_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "wine-quality.csv"
+    )
     data = pd.read_csv(wine_path)
 
     # Split the data into training and test sets. (0.75, 0.25) split.
@@ -63,4 +64,6 @@ if __name__ == "__main__":
         mlflow.log_metric("r2", r2)
         mlflow.log_metric("mae", mae)
 
-        mlflow.sklearn.log_model(lr, "model")
+        mlflow.sklearn.log_model(
+            sk_model=lr, artifact_path="model", registered_model_name="model"
+        )
